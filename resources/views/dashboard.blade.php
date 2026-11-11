@@ -1,20 +1,20 @@
 @extends('layouts.kos')
 @section('title', 'Dashboard - KosKita')
 @section('content')
-<h1>Dashboard</h1>
-<p class="mu">Ringkasan kos hari ini.</p>
+<h1>Ringkasan kos</h1>
+<p class="mu">Pantau ketersediaan kamar, pembayaran, dan aktivitas penghuni.</p>
 <div class="stats">
 <div class="card stat"><b>{{ $total }}</b><span>Total kamar</span></div>
 <div class="card stat"><b>{{ $kosong }}</b><span>Kosong</span></div>
 <div class="card stat"><b>{{ $terisi }}</b><span>Terisi</span></div>
 <div class="card stat"><b>{{ $perawatan }}</b><span>Perawatan</span></div>
 </div>
-<div class="stats" style="grid-template-columns:repeat(2,1fr)">
+<div class="stats two-cols">
 <div class="card stat"><b>Rp {{ number_format($pemasukan, 0, ',', '.') }}</b><span>Pemasukan bulan ini (lunas)</span></div>
 <div class="card stat"><b>Rp {{ number_format($tunggakan, 0, ',', '.') }}</b><span>Total tagihan belum dibayar</span></div>
 </div>
 
-<div class="stats" style="grid-template-columns:repeat(3,1fr)">
+<div class="stats three-cols">
 <a class="card stat" style="text-decoration:none;color:inherit" href="{{ route('tagihan.index') }}"><b>{{ $menunggu }}</b><span>Bukti bayar menunggu verifikasi</span></a>
 <a class="card stat" style="text-decoration:none;color:inherit" href="{{ route('galon.index') }}"><b>{{ $galonBaru }}</b><span>Pesanan galon baru</span></a>
 <a class="card stat" style="text-decoration:none;color:inherit" href="{{ route('pesan.index') }}"><b>{{ $pesanBaru }}</b><span>Pesan belum dibaca</span></a>

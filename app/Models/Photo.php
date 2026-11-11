@@ -21,7 +21,7 @@ class Photo extends Model
 
     public function getUrlAttribute(): string
     {
-        return asset('storage/' . $this->path);
+        return route('media.foto', $this);
     }
 
     protected static function booted(): void

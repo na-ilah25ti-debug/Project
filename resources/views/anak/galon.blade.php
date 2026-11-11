@@ -8,8 +8,8 @@
 <p class="mu">Harga Rp {{ number_format(config('kos.harga_galon'), 0, ',', '.') }} per galon. Bayar ke ibu kos saat galon diantar.</p>
 <form class="card" method="POST" action="{{ route('anak.galon.store') }}" style="max-width:480px">
 @csrf
-<label>Jumlah galon</label><input type="number" name="jumlah" value="{{ old('jumlah', 1) }}" min="1" max="10" required>
-<label>Catatan (opsional)</label><input name="catatan" value="{{ old('catatan') }}" placeholder="Contoh: antar sore ya">
+<label>Jumlah galon <input type="number" name="jumlah" value="{{ old('jumlah', 1) }}" min="1" max="10" required></label>
+<label>Catatan (opsional) <input name="catatan" value="{{ old('catatan') }}" maxlength="150" placeholder="Contoh: antar sore ya"></label>
 <p style="margin-top:14px"><button class="btn">Pesan galon</button></p>
 </form>
 <h2>Riwayat pesanan</h2>

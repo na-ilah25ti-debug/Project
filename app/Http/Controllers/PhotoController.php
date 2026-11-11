@@ -6,9 +6,18 @@ use App\Models\House;
 use App\Models\Photo;
 use App\Models\Room;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PhotoController extends Controller
 {
+    public function show(Photo $photo)
+    {
+        $disk = Storage::disk('public');
+        abort_unless($disk->exists($photo->path), 404);
+
+        return $disk->response($photo->path, headers: ['X-Content-Type-Options' => 'nosniff']);
+    }
+
     public function index()
     {
         return view('photos.index', [

@@ -1,58 +1,60 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# KosKita
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+KosKita adalah aplikasi Laravel untuk satu pemilik dengan tiga rumah kos. Data awal dari proyek mencakup Saka Kost (8 kamar putri), Kos Syariah (6 kamar putri), dan Kos Cowok (10 kamar putra).
 
-## About Laravel
+## Coba versi baru di Laragon
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Gunakan PHP 8.4.1 atau lebih baru sesuai dependensi dalam arsip. Pilih PHP 8.4 di Laragon dan jalankan perintah berikut dari Terminal Laragon atau PowerShell di folder yang berisi `artisan`. Dependensi PHP dan aset CSS/JS yang sudah dibangun ada di ZIP.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+1. Ekstrak ZIP ke folder baru, misalnya `D:\laragon-6.0-minimal\www\KosKita-Revisi`.
+2. Buat konfigurasi dan database SQLite lokal.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+   ```powershell
+   Copy-Item .env.example .env
+   New-Item -ItemType File database\database.sqlite
+   php artisan key:generate
+   php artisan migrate --seed
+   ```
 
-## Learning Laravel
+   Aktifkan `extension=pdo_sqlite` pada `php.ini` PHP yang dipilih bila muncul pesan **could not find driver**. Cek lokasi konfigurasi dengan `php --ini`.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+3. Buat akun pemilik dengan email khusus. Kata sandi dimasukkan saat diminta oleh terminal.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+   ```powershell
+   php artisan kos:pemilik pemilik@example.com
+   php artisan serve
+   ```
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+4. Buka [beranda](http://127.0.0.1:8000). Khusus pemilik, ketik [alamat login pemilik](http://127.0.0.1:8000/admin/masuk) langsung di browser.
 
-## Agentic Development
+Jika memakai virtual host Laragon, arahkan document root ke folder `public` aplikasi dan sesuaikan `APP_URL`.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Setel data kos
 
-```bash
-composer require laravel/boost --dev
+Isi nilai di `.env` sebelum digunakan oleh penghuni.
 
-php artisan boost:install
-```
+| Variabel | Isi |
+| --- | --- |
+| `KOS_WHATSAPP` | Nomor WhatsApp asli pemilik, format `628…`, tanpa tanda plus atau spasi. Tombol WhatsApp pemilik muncul setelah diisi. |
+| `KOS_NAMA_IBU` | Nama yang akan ditampilkan di halaman kontak. |
+| `KOS_REKENING` | Bank, nomor rekening, dan nama pemilik rekening yang sudah dikonfirmasi. |
+| `KOS_HARGA_GALON` | Harga per galon dalam rupiah. |
+| `APP_TIMEZONE` | Zona waktu operasional. Default `Asia/Jakarta`. |
+| `MAIL_*` | Setelan SMTP jika tautan reset kata sandi perlu dikirim melalui email. Setelan lokal `log` mencatat tautan ke log. |
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Setelah mengubah konfigurasi, jalankan `php artisan config:clear`. Cocokkan harga, fasilitas, dan status kamar pada menu **Kamar** dengan kondisi nyata. Seed memakai nama, harga, dan fasilitas dari proyek awal. Kamar yang baru ditambahkan oleh seed berstatus kosong. Menu **Foto** menerima foto asli untuk banner, rumah, kamar, dan fasilitas. Banner bawaan berlabel ilustrasi.
 
-## Contributing
+## Alur penggunaan
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- **Pengunjung** bisa menyaring kamar berdasarkan rumah, putri/putra, harga, tipe, dan status. Pengunjung bisa menanyakan kamar lewat WhatsApp atau mengirim formulir. Pesan tamu masuk ke panel pemilik dan bisa dibalas melalui WhatsApp.
+- **Penghuni** mendaftar dari halaman masuk. Di panel pemilik, buka **Penghuni → Tambah penghuni**, pilih kamar, dan masukkan email yang sudah didaftarkan. Akun juga bisa dibuat dari formulir itu dengan kata sandi sementara. Penghuni dapat mengubah kata sandi di **Akun saya**.
+- **Tagihan** dibuat oleh pemilik per bulan pada menu **Tagihan**. Penghuni transfer sesuai instruksi, lalu mengunggah bukti. Pemilik bisa menerima atau menolak bukti, serta menandai pembayaran langsung sebagai lunas. Peringatan jatuh tempo tampil di dasbor. Transfer berlangsung di luar aplikasi.
+- **Laporan dan galon** dikirim penghuni dari dasbornya. Pemilik memperbarui status dari **Laporan** atau **Pesanan galon**. Penghuni dapat melihat perubahan di riwayatnya.
 
-## Code of Conduct
+## Pakai database proyek lama
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Simpan cadangan database lama dan gunakan folder aplikasi baru. Salin konfigurasi koneksi, `APP_KEY`, dan pengaturan kos yang diperlukan dari `.env` lama. Salin juga foto dari `storage/app/public` dan bukti bayar dari `storage/app/private` jika ada. Untuk SQLite, salin file SQLite lama. Jalankan `php artisan migrate` dan `php artisan optimize:clear`. Gunakan `php artisan kos:pemilik EMAIL_LAMA` untuk mengganti kata sandi akun pemilik lama, termasuk akun contoh dari versi awal.
 
-## Security Vulnerabilities
+## Uji lokal
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Jalankan `php artisan test` setelah konfigurasi lokal siap dan PDO SQLite aktif. Jika dependensi perlu dipasang ulang, jalankan `composer install` menggunakan lockfile proyek.

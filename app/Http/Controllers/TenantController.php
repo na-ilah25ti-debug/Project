@@ -7,6 +7,7 @@ use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class TenantController extends Controller
 {
@@ -19,7 +20,9 @@ class TenantController extends Controller
 
     public function create()
     {
-        return view('tenants.create', ['rooms' => Room::with('house')->where('status', 'kosong')->orderBy('house_id')->orderBy('nomor')->get()]);
+        return view('tenants.create', [
+            'rooms' => Room::with('house')->where('status', 'kosong')->orderBy('house_id')->orderBy('nomor')->get(),
+        ]);
     }
 
     public function store(Request $request)
@@ -29,28 +32,39 @@ class TenantController extends Controller
             'nama' => ['required', 'string', 'max:100'],
             'no_hp' => ['required', 'string', 'max:20'],
             'tanggal_masuk' => ['required', 'date'],
-            'email' => ['nullable', 'email', 'unique:users,email'],
-            'password' => ['nullable', 'required_with:email', 'string', 'min:6'],
+            'email' => ['nullable', 'email', 'max:255'],
+            'password' => ['nullable', 'string', 'min:8', 'max:72'],
         ]);
 
-        // A8: status kamar berubah otomatis saat penghuni masuk
         DB::transaction(function () use ($data) {
             $room = Room::lockForUpdate()->findOrFail($data['room_id']);
-            abort_if($room->status !== 'kosong', 422, 'Kamar tidak tersedia.');
+            if ($room->status !== 'kosong') {
+                throw ValidationException::withMessages(['room_id' => 'Kamar sudah tidak tersedia.']);
+            }
 
-            // Akun login untuk anak kos (opsional)
             $userId = null;
             if (! empty($data['email'])) {
-                $userId = User::create([
-                    'name' => $data['nama'],
-                    'email' => $data['email'],
-                    'password' => bcrypt($data['password']),
-                    'role' => 'penghuni',
-                ])->id;
+                $email = mb_strtolower($data['email']);
+                $user = User::where('email', $email)->lockForUpdate()->first();
+                if ($user && ($user->role !== 'penghuni' || $user->tenant()->exists())) {
+                    throw ValidationException::withMessages(['email' => 'Email ini tidak bisa dihubungkan ke kamar.']);
+                }
+                if (! $user) {
+                    if (empty($data['password'])) {
+                        throw ValidationException::withMessages(['password' => 'Isi kata sandi sementara untuk membuat akun baru.']);
+                    }
+                    $user = User::create([
+                        'name' => $data['nama'],
+                        'email' => $email,
+                        'password' => $data['password'],
+                        'role' => 'penghuni',
+                    ]);
+                }
+                $userId = $user->id;
             }
 
             Tenant::create([
-                'room_id' => $data['room_id'],
+                'room_id' => $room->id,
                 'user_id' => $userId,
                 'nama' => $data['nama'],
                 'no_hp' => $data['no_hp'],
@@ -64,12 +78,19 @@ class TenantController extends Controller
 
     public function checkout(Tenant $tenant)
     {
-        // A8: status kamar kembali kosong saat penghuni keluar
-        DB::transaction(function () use ($tenant) {
+        $changed = DB::transaction(function () use ($tenant) {
+            $room = Room::whereKey($tenant->room_id)->lockForUpdate()->first();
+            $tenant = Tenant::lockForUpdate()->findOrFail($tenant->id);
+            if (! $tenant->aktif) {
+                return false;
+            }
+
             $tenant->update(['aktif' => false, 'tanggal_keluar' => now()]);
-            $tenant->room?->update(['status' => 'kosong']);
+            $room?->update(['status' => 'kosong']);
+
+            return true;
         });
 
-        return back()->with('ok', 'Penghuni keluar, kamar kembali kosong.');
+        return back()->with('ok', $changed ? 'Penghuni keluar, kamar kembali kosong.' : 'Penghuni sudah tercatat keluar.');
     }
 }

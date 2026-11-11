@@ -20,6 +20,6 @@ class Payment extends Model
 
     public function getTerlambatAttribute(): bool
     {
-        return $this->status === 'belum' && $this->jatuh_tempo->isPast();
+        return $this->status === 'belum' && $this->jatuh_tempo->lt(today());
     }
 }

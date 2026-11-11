@@ -8,8 +8,8 @@
 <p class="mu">Laporan untuk {{ $t->room->label }}. Pantau statusnya di bawah.</p>
 <form class="card" method="POST" action="{{ route('anak.laporan.store') }}" style="max-width:560px">
 @csrf
-<label>Masalah</label><input name="judul" value="{{ old('judul') }}" placeholder="Contoh: Keran kamar mandi bocor" required>
-<label>Keterangan (opsional)</label><textarea name="deskripsi" rows="3">{{ old('deskripsi') }}</textarea>
+<label>Masalah <input name="judul" value="{{ old('judul') }}" maxlength="150" placeholder="Contoh: Keran kamar mandi bocor" required></label>
+<label>Keterangan (opsional) <textarea name="deskripsi" rows="3" maxlength="1000">{{ old('deskripsi') }}</textarea></label>
 <p style="margin-top:14px"><button class="btn">Kirim laporan</button></p>
 </form>
 <h2>Laporanku</h2>

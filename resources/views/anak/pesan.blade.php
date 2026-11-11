@@ -5,9 +5,9 @@
 <p class="mu">Kirim pertanyaan atau permintaan (tambah lemari, pindah kamar, dll.). Atau langsung chat lewat WhatsApp.</p>
 <form class="card" method="POST" action="{{ route('anak.pesan.store') }}" style="max-width:560px">
 @csrf
-<label>Pesan</label><textarea name="isi" rows="3" required>{{ old('isi') }}</textarea>
+<label>Pesan <textarea name="isi" rows="3" maxlength="1000" required>{{ old('isi') }}</textarea></label>
 <p style="margin-top:14px"><button class="btn">Kirim</button>
-<a class="btn wa" target="_blank" rel="noopener" href="https://wa.me/{{ config('kos.whatsapp') }}?text={{ rawurlencode('Halo ' . config('kos.nama_ibu') . ', saya ' . auth()->user()->name . ' penghuni kos.') }}">WhatsApp</a></p>
+@if (config('kos.whatsapp'))<a class="btn ghost" target="_blank" rel="noopener" href="https://wa.me/{{ config('kos.whatsapp') }}?text={{ rawurlencode('Halo, saya ' . auth()->user()->name . ', penghuni kos.') }}">WhatsApp</a>@endif</p>
 </form>
 <h2>Percakapan</h2>
 @forelse ($messages as $m)

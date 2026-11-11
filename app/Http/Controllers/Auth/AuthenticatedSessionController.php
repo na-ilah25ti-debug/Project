@@ -19,16 +19,24 @@ class AuthenticatedSessionController extends Controller
         return view('auth.login');
     }
 
+    public function createOwner(): View
+    {
+        return view('auth.owner-login');
+    }
+
     /**
      * Handle an incoming authentication request.
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate();
+        $ownerLogin = $request->routeIs('admin.login.store');
+        $request->authenticate($ownerLogin ? 'pemilik' : 'penghuni');
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $request->session()->forget('url.intended');
+
+        return redirect(route($ownerLogin ? 'admin.dashboard' : 'dashboard', absolute: false));
     }
 
     /**

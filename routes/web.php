@@ -1,12 +1,14 @@
 <?php
 
 use App\Http\Controllers\AnakController;
+use App\Http\Controllers\BukaKostController;
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GalonController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PhotoController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicRoomController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\TenantController;
@@ -16,6 +18,8 @@ use Illuminate\Support\Facades\Route;
 
 // ---------- Publik ----------
 Route::get('/', [PublicRoomController::class, 'index'])->name('home');
+Route::get('kamar/{room}', [PublicRoomController::class, 'show'])->name('kamar.detail');
+Route::get('foto-kos/{photo}', [PhotoController::class, 'show'])->name('media.foto');
 Route::post('/pesan', [PublicRoomController::class, 'kirimPesan'])->middleware('throttle:5,1')->name('pesan.kirim');
 
 // ---------- Setelah login: arahkan sesuai peran ----------
@@ -27,6 +31,9 @@ Route::middleware('auth')->group(function () {
     })->name('dashboard');
 
     Route::get('bukti/{payment}', [PaymentController::class, 'bukti'])->name('bukti.show');
+    Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 // ---------- Panel pemilik (ibu kos) ----------
@@ -55,6 +62,9 @@ Route::middleware(['auth', OwnerOnly::class])->prefix('admin')->group(function (
     Route::get('laporan', [ComplaintController::class, 'index'])->name('laporan.index');
     Route::post('laporan', [ComplaintController::class, 'store'])->name('laporan.store');
     Route::patch('laporan/{complaint}', [ComplaintController::class, 'update'])->name('laporan.update');
+
+    Route::get('pengajuan', [BukaKostController::class, 'index'])->name('pengajuan.index');
+    Route::patch('pengajuan/{application}', [BukaKostController::class, 'update'])->name('pengajuan.update');
 
     Route::get('pesan', [MessageController::class, 'index'])->name('pesan.index');
     Route::patch('pesan/{message}/balas', [MessageController::class, 'balas'])->name('pesan.balas');

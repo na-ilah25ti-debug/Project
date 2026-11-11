@@ -2,7 +2,7 @@
 @section('title', 'Galon - KosKita')
 @section('content')
 <h1>Pesanan galon</h1>
-<p class="mu">Pesanan dari anak kos. Harga per galon: Rp {{ number_format(config('kos.harga_galon'), 0, ',', '.') }} (atur lewat KOS_HARGA_GALON di .env).</p>
+<p class="mu">Kelola pesanan dari penghuni. Harga saat ini Rp {{ number_format(config('kos.harga_galon'), 0, ',', '.') }} per galon.</p>
 <div class="scroll"><table>
 <tr><th>Tanggal</th><th>Penghuni</th><th>Kamar</th><th>Jumlah</th><th>Total</th><th>Catatan</th><th>Status</th><th>Ubah</th></tr>
 @forelse ($orders as $o)
